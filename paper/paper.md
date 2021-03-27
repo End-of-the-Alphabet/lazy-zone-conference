@@ -4,7 +4,7 @@ subtitle: Approximations of the Traveling Salesman Problem
 author: Ashton Wiersdorf, Carter Wonnacott, and Pierce Yeakley
 date: \today
 header-includes:
-- \usepackage{fullpage}
+- \usepackage[margin=1in]{geometry}
 ---
 
 \begin{abstract}
