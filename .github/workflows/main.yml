@@ -27,7 +27,7 @@ jobs:
       - run: |
           echo "FILELIST=paper/paper.md" >> $GITHUB_ENV
           
-      - uses: docker://pandoc/latex
+      - uses: docker://pandoc/latex:2.9
         with:
           args: --output=paper/paper.pdf ${{ env.FILELIST }}
             
