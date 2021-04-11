@@ -2,6 +2,7 @@
 
 from types import BuiltinFunctionType
 from which_pyqt import PYQT_VER
+
 if PYQT_VER == 'PYQT5':
     from PyQt5.QtCore import QLineF, QPointF
 elif PYQT_VER == 'PYQT4':
@@ -17,13 +18,13 @@ from TSPClasses import *
 import heapq
 import itertools
 
+
 class TSPSolver:
-    def __init__( self, gui_view ):
+    def __init__(self, gui_view):
         self._scenario = None
 
-    def setupWithScenario( self, scenario ):
+    def setupWithScenario(self, scenario):
         self._scenario = scenario
-
 
     ''' <summary>
         This is the entry point for the default solver
@@ -35,8 +36,8 @@ class TSPSolver:
         solution found, and three null values for fields not used for this 
         algorithm</returns> 
     '''
-    
-    def defaultRandomTour( self, time_allowance=60.0 ):
+
+    def defaultRandomTour(self, time_allowance=60.0):
         results = {}
         cities = self._scenario.getCities()
         ncities = len(cities)
@@ -44,13 +45,13 @@ class TSPSolver:
         count = 0
         bssf = None
         start_time = time.time()
-        while not foundTour and time.time()-start_time < time_allowance:
+        while not foundTour and time.time() - start_time < time_allowance:
             # create a random permutation
-            perm = np.random.permutation( ncities )
+            perm = np.random.permutation(ncities)
             route = []
             # Now build the route using the random permutation
-            for i in range( ncities ):
-                route.append( cities[ perm[i] ] )
+            for i in range(ncities):
+                route.append(cities[perm[i]])
             bssf = TSPSolution(route)
             count += 1
             if bssf.cost < np.inf:
@@ -78,7 +79,7 @@ class TSPSolver:
         algorithm</returns> 
     '''
 
-    def greedy( self,time_allowance=60.0 ):
+    def greedy(self, time_allowance=60.0):
         inst = Instrumenter()
         cities = self._scenario.getCities()
         cities.sort(key=lambda c: c._index)
@@ -97,7 +98,7 @@ class TSPSolver:
                     'soln': TSPSolution(state_path(final_state)),
                     'max': inst.max_queue,
                     'total': inst.states_created,
-                    'pruned': inst.states_pruned }
+                    'pruned': inst.states_pruned}
         else:
             return {'cost': float('inf'),
                     'time': end_time - start_time,
@@ -105,8 +106,8 @@ class TSPSolver:
                     'soln': None,
                     'max': inst.max_queue,
                     'total': inst.states_created,
-                    'pruned': inst.states_pruned }
-    
+                    'pruned': inst.states_pruned}
+
     ''' <summary>
         This is the entry point for the branch-and-bound algorithm that you will implement
         </summary>
@@ -115,8 +116,8 @@ class TSPSolver:
         not include the initial BSSF), the best solution found, and three more ints: 
         max queue size, total number of states created, and number of pruned states.</returns> 
     '''
-        
-    def branchAndBound( self, time_allowance=60.0 ):
+
+    def branchAndBound(self, time_allowance=60.0):
         inst = Instrumenter()
 
         start_time = time.time()
@@ -132,7 +133,7 @@ class TSPSolver:
                     'soln': TSPSolution(state_path(final_state)),
                     'max': inst.max_queue,
                     'total': inst.states_created,
-                    'pruned': inst.states_pruned }
+                    'pruned': inst.states_pruned}
         else:
             return {'cost': float('inf'),
                     'time': end_time - start_time,
@@ -140,8 +141,7 @@ class TSPSolver:
                     'soln': None,
                     'max': inst.max_queue,
                     'total': inst.states_created,
-                    'pruned': inst.states_pruned }
-
+                    'pruned': inst.states_pruned}
 
     ''' <summary>
         This is the entry point for the algorithm you'll write for your group project.
@@ -151,18 +151,140 @@ class TSPSolver:
         best solution found.  You may use the other three field however you like.
         algorithm</returns> 
     '''
-        
-    def fancy( self,time_allowance=60.0 ):
-        pass
+
+    def fancy(self, time_allowance=60.0):
+        inst = Instrumenter()
+
+        start_time = time.time()
+        cities = self._scenario.getCities()
+        ncities = len(cities)
+
+        city_dict = {}
+        index_dict = {}
+        start_indices = []
+        final_cities = []
+
+        for i in range(ncities):
+            city_dict[cities[i]] = i
+            index_dict[i] = cities[i]
+
+        start_bssf = self.greedy().get('soln').route
+
+        for city in start_bssf:
+            start_indices.append(city_dict[city])
+
+        final_state = tabu_search(self._scenario.getCities(), time_allowance, inst, start_indices)
+
+        for index in final_state:
+            final_cities.append(index_dict[index])
+
+        end_time = time.time()
+
+        if not (final_state is None):
+            return {'cost': state_lb(final_state),
+                    'time': end_time - start_time,
+                    'count': inst.solutions_found,
+                    'soln': TSPSolution(state_path(final_state)),
+                    'max': inst.max_queue,
+                    'total': inst.states_created,
+                    'pruned': inst.states_pruned}
+        else:
+            return {'cost': float('inf'),
+                    'time': end_time - start_time,
+                    'count': inst.solutions_found,
+                    'soln': None,
+                    'max': inst.max_queue,
+                    'total': inst.states_created,
+                    'pruned': inst.states_pruned}
+
+
+tabu_list = []
+tabu_limit = 30
+cost_array = []
+
+def tabu_search(cities, time_allowance, instrumenter, curr_bssf):
+    # get cost array
+    init_cost_array(cities)
+
+    # start search, end search when time runs out
+    start_time = time.time()
+    base_neighborhood_def = 3
+    curr_neighborhood_def = base_neighborhood_def
+    while time.time() - start_time < time_allowance:
+        # TODO: use instrumenter
+        old_bssf = curr_bssf
+        curr_bssf = tabu_helper(curr_bssf, curr_neighborhood_def)
+        if curr_bssf == old_bssf:
+            curr_neighborhood_def += 1
+        else:
+            curr_neighborhood_def = base_neighborhood_def
+        if curr_neighborhood_def == cities.length:
+            break
+
+    # TODO: convert curr_bssf into an array of cities
+    return curr_bssf
+
+
+'''
+    :param path: array of integers representing cities
+    :param neighborhood_def: int representing the definition of "neighborhood" in our local search
+    
+    :return updated_path: best path in the neighborhood
+'''
+def tabu_helper(path, neighborhood_def):
+    outside_neighborhood = path[:path.length - neighborhood_def]
+    inside_neighborhood = path[path.length - neighborhood_def:]
+    neighborhood_permutations = get_all_perms(inside_neighborhood)
+
+    path_perms = []
+    for permutation in neighborhood_permutations:
+        path_perms.append(outside_neighborhood + permutation)
+
+    best_path = path
+    for path in path_perms:
+        # TODO: make sure that .__contains__ works correctly
+        if not tabu_list.__contains__(path) and get_cost(path) < get_cost(best_path):
+            best_path = path
+
+    tabu_list.append(best_path)
+    if tabu_list.length > tabu_limit:
+        tabu_list.remove(tabu_list[0])
+
+    return best_path
+
+
+def get_all_perms(arr):
+    perms = list(itertools.permutations(arr))
+    perm_list = [list(perm) for perm in perms]
+    return perm_list
+
+
+def get_cost(path):
+    path_cost = 0
+    for i in path:
+        if i + 1 == path.length:
+            path_cost += cost_array[i][path[0]]
+        else:
+            path_cost += cost_array[i][i + 1]
+    return path_cost
+
+
+def init_cost_array(cities):
+    for i in range(cities.length):
+        cost_row = []
+        for j in range (cities.length):
+            cost_row.append(cities[i].costTo(cities[j]))
+        cost_array.append(cost_row)
+
 
 ############################################################
 #
 #             Strategy: Branch-and-Bound
 #
 ############################################################
-        
+
 # Type Definitions
-#---------
+# ---------
 # Time :: time
 # Instrument :: {max_queue:Nat, states_created:Nat, states_pruned:Nat}
 # BbState :: (CostMatrix:[[Real]], LowerBound:Real, Depth:Nat, Path:[City])
@@ -191,6 +313,7 @@ def dfs_greedy(cities, state, instrument):
 
         return None
 
+
 def test_dfs_greedy():
     loc = [QPointF(0, 2), QPointF(2, 3), QPointF(3, 1), QPointF(1, -2), QPointF(-2, 0)]
     s = Scenario(loc, "", 0)
@@ -217,7 +340,7 @@ def test_dfs_greedy():
     loc = [QPointF(0, 2), QPointF(2, 3), QPointF(3, 1), QPointF(1, -2), QPointF(-2, 0)]
     s = Scenario(loc, "", 0)
     cs = s.getCities()
-    s._edge_exists[4,0] = False
+    s._edge_exists[4, 0] = False
     assert cost(cs[4], cs[0]) == float('inf')
     cs.sort(key=lambda i: i._index)
 
@@ -232,8 +355,10 @@ def test_dfs_greedy():
     fs = dfs_greedy(cs, st, instrument)
     assert not fs is None
     assert state_path(fs) == [cs[0], cs[4], cs[3], cs[2], cs[1]]
-    assert state_lb(fs) == cost(cs[0], cs[4]) + cost(cs[4], cs[3]) + cost(cs[3], cs[2]) + cost(cs[2], cs[1]) + cost(cs[1], cs[0])
+    assert state_lb(fs) == cost(cs[0], cs[4]) + cost(cs[4], cs[3]) + cost(cs[3], cs[2]) + cost(cs[2], cs[1]) + cost(
+        cs[1], cs[0])
     assert instrument.states_created == 10
+
 
 # strat_bb :: [City] -> Time -> Instrument -> Optional(BbState)
 def strat_bb(cities, time_allowance, instrumenter):
@@ -279,7 +404,7 @@ def strat_bb(cities, time_allowance, instrumenter):
         # bssf that we have
         else:
             next_states = gen_next_states(st, cities)
-            
+
             if len(next_states) == 0:
                 print("Found a solution that's worse than our best so far")
 
@@ -307,11 +432,13 @@ def strat_bb(cities, time_allowance, instrumenter):
     #     total_cost += this_cost
     # print(f"Total cost: {total_cost}")
     # assert total_cost != float('inf')
-    
+
     return bssf
 
+
 def test_strat_bb():
-    loc = [QPointF(0, 0), QPointF(1, 1), QPointF(2, 2), QPointF(3, 3), QPointF(4, 4), QPointF(5, 5), QPointF(6, 6), QPointF(7, 7)]
+    loc = [QPointF(0, 0), QPointF(1, 1), QPointF(2, 2), QPointF(3, 3), QPointF(4, 4), QPointF(5, 5), QPointF(6, 6),
+           QPointF(7, 7)]
     s = Scenario(loc, "Test", 0)
     dist = [[float('inf'), 2, float('inf'), float('inf'), float('inf'), 1, float('inf'), 1],
             [2, float('inf'), 1, float('inf'), 1, float('inf'), float('inf'), float('inf')],
@@ -332,8 +459,10 @@ def test_strat_bb():
 
     assert [i._index for i in state_path(final_state)] == [0, 5, 4, 1, 2, 3, 6, 7]
 
+
 def test_strat_bb2():
-    loc = [QPointF(0, 0), QPointF(1, 1), QPointF(2, 2), QPointF(3, 3), QPointF(4, 4), QPointF(5, 5), QPointF(6, 6), QPointF(7, 7)]
+    loc = [QPointF(0, 0), QPointF(1, 1), QPointF(2, 2), QPointF(3, 3), QPointF(4, 4), QPointF(5, 5), QPointF(6, 6),
+           QPointF(7, 7)]
     s = Scenario(loc, "Test", 0)
     dist = [[float('inf'), 1, float('inf'), float('inf'), float('inf'), 2, float('inf'), 1],
             [2, float('inf'), 1, float('inf'), 1, float('inf'), float('inf'), float('inf')],
@@ -353,15 +482,17 @@ def test_strat_bb2():
     # print(f"queue: {inst.max_queue}; created: {inst.states_created}; pruned: {inst.states_pruned}")
     assert [i._index for i in state_path(final_state)] == [0, 7, 6, 3, 2, 1, 4, 5]
 
+
 # bb_init_state :: [City] -> BbState
 def bb_init_state(cities, start_city):
     # Set up cost matrix
-    cost_matrix = [ [cost(i, j) for j in cities] for i in cities]
+    cost_matrix = [[cost(i, j) for j in cities] for i in cities]
     (cost_matrix, lower_bound) = reduce_cost(cost_matrix)
 
     path = [start_city]
 
     return (cost_matrix, lower_bound, 0, path)
+
 
 # gen_next_states :: BbState -> [City] -> [BbState]
 def gen_next_states(start_state, pool):
@@ -381,14 +512,15 @@ def gen_next_states(start_state, pool):
 
             # inf out back edges
             for i in start_state[3]:
-                new_matrix[c._index][i._index] = float('inf') 
-            
+                new_matrix[c._index][i._index] = float('inf')
+
             (new_matrix, new_lb) = reduce_cost(new_matrix)
-            new_state = (new_matrix, start_state[1] + new_lb + cost, start_state[2]+1, start_state[3] + [c])
+            new_state = (new_matrix, start_state[1] + new_lb + cost, start_state[2] + 1, start_state[3] + [c])
 
             next_states.append(new_state)
 
     return next_states
+
 
 def test_gen_next_states():
     loc = [QPointF(0, 2), QPointF(2, 3), QPointF(3, 1), QPointF(1, -2), QPointF(-2, 0)]
@@ -469,10 +601,12 @@ def test_gen_next_states():
         for c in r:
             assert c == float('inf')
 
+
 def print_matrix(mtx):
     print()
     for r in mtx:
         print(r)
+
 
 def pprint_state(st):
     print("/--------------------------------------------------\\")
@@ -483,18 +617,23 @@ def pprint_state(st):
 
     print_matrix(st[0])
     print("\\--------------------------------------------------/")
-    
+
+
 def state_lb(state):
     return state[1]
+
 
 def state_depth(state):
     return state[2]
 
+
 def state_path(s):
     return s[3]
 
+
 def heap_state_lb(state):
     return (state_lb(state), state)
+
 
 # heap_socre_state :: BbState -> Nat -> Real -> Real
 def heap_score_state(state, count_cities, bssf_score):
@@ -508,11 +647,12 @@ def heap_score_state(state, count_cities, bssf_score):
     # best search has found.
 
     (_, lb, depth, _) = state
-    return lb - (bssf_score * ( (depth ** 2) / (count_cities ** 2)))
+    return lb - (bssf_score * ((depth ** 2) / (count_cities ** 2)))
 
 
 def heap_state_depth(state):
     return (state_depth(state), state)
+
 
 # reduce_cost :: [[Real]] -> ([[Real]], Real)
 def reduce_cost(m):
@@ -531,7 +671,7 @@ def reduce_cost(m):
             cost = cost + mm
             for j in range(c):
                 m[i][j] = m[i][j] - mm
-            
+
     # Columns now
     for i in range(c):
         mm = float('inf')
@@ -542,8 +682,9 @@ def reduce_cost(m):
             cost = cost + mm
             for j in range(c):
                 m[j][i] = m[j][i] - mm
-        
+
     return (m, cost)
+
 
 def test_reduce_cost():
     inf = float('inf')
@@ -582,9 +723,11 @@ def test_reduce_cost():
     del mtx_verify[3][3]
     assert mtx == mtx_verify
 
+
 # still_timep :: Time -> Real -> Bool
 def still_timep(start, amount):
     return time.time() - start < amount
+
 
 # cost :: City -> City -> Real
 def cost(c1, c2):
