@@ -8,12 +8,14 @@ header-includes:
 ---
 
 \begin{abstract}
-Finding an optimal solution to the Traveling Salesperson Problem runs in order $O(n!)$ with respect to the number of cities in the brute-force case. Taking advantage of dynamic programming and intelligent search can reduce this to $O({n^2}2^n)$, but this remains exponential and entirely intractable for large problemsets. When a solution is needed, approximations can satsifice for our needs. In this paper, we present one such optimzation, the Tabu Search.
+Finding an optimal solution to the Traveling Salesperson Problem runs in order $O(n!)$ with respect to the number of cities in the brute-force case. Taking advantage of dynamic programming and intelligent search can reduce this to $O({n^2}2^n)$, but this remains exponential and entirely intractable for large problemsets. When a solution is needed, approximations can satsifice for our needs. In this paper we present one such optimzation, the Tabu Search, which shares many similarities to a local search algorithm.
 \end{abstract}
 
 # Introduction
 
 <!-- Describe the TSP -->
+
+
 <!-- Consider describing the intelligent-search mechanism of the B&B algorithm, because that will have some relevance with the Tabu Search. -->
 
 # A Greedy Approach
