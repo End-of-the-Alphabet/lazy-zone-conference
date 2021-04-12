@@ -1,5 +1,5 @@
-*.png
 __pycache__
 .envrc
 venv
 .idea/
+/icon312.png
