@@ -85,7 +85,7 @@ This is expected; this is just a depth-first search of our graph where we let th
 
 @section{Tabu Search: No Forbidden Paths}
 
-Can we do better than greedy without spending all the effort to find an optimal solution? The Tabu List algorithm is a local search algorithm: from a starting state, the Tabu Search attempts to find better solutions living relatively nearby in the solution space to the TSP.
+Can we do better than greedy without spending all the effort to find an optimal solution? The Tabu List @~cite{noauthor_tabu_2021} algorithm is a local search algorithm: from a starting state, the Tabu Search attempts to find better solutions living relatively nearby in the solution space to the TSP.
 
 @subsection{Intuition}
 
@@ -121,6 +121,8 @@ Step 1 takes @${O(1)} time to initialize the algorithm. Step 2 calls out to the 
 Step 3 is @${O(1)} if we choose our data structures correctly; a good implementation can just set pointers to subsets of an array appropriately and be done.
 
 Steps 4 and 5 are a little trickier. First, we generate all the permuatations of a set. Knuth @~cite{knuth_art_2005} lists several algorithms; however, for smaller values of the neighborhood @${N}, a simple recursive solution should be sufficient. For the purposes of this analysis, we'll consider permutation creation @${O(N)}@note{@${N}, not @${n}: it's relative to the size of our neighborhood parameter.} and checking tabu list for set inclusion to be order @${O(1)}; a hash map may be used to implement quick insertion and deletion of set elements.
+
+@; TODO: finish up here
 
 @section{Evaluation}
 
