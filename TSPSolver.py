@@ -80,33 +80,42 @@ class TSPSolver:
     '''
 
     def greedy(self, time_allowance=60.0):
-        inst = Instrumenter()
-        cities = self._scenario.getCities()
-        cities.sort(key=lambda c: c._index)
-
+        results = {}
+        cities = self._scenario.getCities().copy()
+        foundTour = False
+        bssf = None
         start_time = time.time()
-        start_state = bb_init_state(cities, cities[0])
-
-        final_state = dfs_greedy(cities, start_state, inst)
-
+        curr_index = 0
+        # At most time_allowance time to complete
+        while not foundTour and time.time() - start_time < time_allowance:
+            if len(cities) == 0:
+                break
+            curr_city = cities.pop(curr_index)  # Pop is O(1) complexity both space and time
+            curr_route = [curr_city]
+            while len(cities):  # As long as cities isn't empty this will run, O(n) space and time
+                closest_path = float('inf')
+                index = 0  # O(n) -- for loop
+                for i in range(len(cities)):
+                    dist = curr_city.costTo(cities[i])
+                    if dist < closest_path:
+                        closest_path = dist
+                        index = i
+                curr_city = cities.pop(index)  # Another O(1) pop
+                curr_route.append(curr_city)
+            bssf = TSPSolution(curr_route)
+            if bssf.cost != float('inf'):
+                foundTour = True
+            curr_index += 1
         end_time = time.time()
+        results['cost'] = bssf.cost if foundTour else math.inf
+        results['time'] = end_time - start_time
+        results['count'] = 1
+        results['soln'] = bssf
+        results['max'] = None
+        results['total'] = None
+        results['pruned'] = None
+        return results
 
-        if not (final_state is None):
-            return {'cost': state_lb(final_state),
-                    'time': end_time - start_time,
-                    'count': inst.solutions_found,
-                    'soln': TSPSolution(state_path(final_state)),
-                    'max': inst.max_queue,
-                    'total': inst.states_created,
-                    'pruned': inst.states_pruned}
-        else:
-            return {'cost': float('inf'),
-                    'time': end_time - start_time,
-                    'count': inst.solutions_found,
-                    'soln': None,
-                    'max': inst.max_queue,
-                    'total': inst.states_created,
-                    'pruned': inst.states_pruned}
 
     ''' <summary>
         This is the entry point for the branch-and-bound algorithm that you will implement
@@ -273,7 +282,8 @@ def get_cost(path):
     print("entered get_cost")
     path_cost = 0
     for i in range(len(path)):
-        path_cost += cost_array[path[i]][path[(i + 1) % len(path)]]
+        j = (i + 1) % len(path)
+        path_cost += cost_array[path[i]][path[j]]
     return path_cost
 
 
