@@ -243,18 +243,10 @@ def tabu_helper(path, neighborhood_def, start_time, time_allowance):
     # so, let (outside, inside) (split-at-from-end path neighborhood_def)
     outside_neighborhood = path[:len(path) - neighborhood_def]
     inside_neighborhood = path[len(path) - neighborhood_def:]
-    neighborhood_permutations = get_all_perms(inside_neighborhood)
-
-    path_perms = []
-    for permutation in neighborhood_permutations:
-        if time.time() - start_time > time_allowance:
-            return path
-        new_perm = outside_neighborhood + permutation
-        if new_perm not in tabu_list:
-            path_perms.append(outside_neighborhood + permutation)
 
     best_path = path
-    for path in path_perms:
+    for perm in itertools.permutations(inside_neighborhood):
+        path = outside_neighborhood + list(perm)
         if time.time() - start_time > time_allowance:
             return best_path
         # TODO: make sure that not in works correctly
@@ -274,7 +266,6 @@ def get_all_perms(arr):
 
 
 def get_cost(path):
-    print("entered get_cost")
     path_cost = 0
     for i in range(len(path)):
         j = (i + 1) % len(path)
@@ -283,7 +274,6 @@ def get_cost(path):
 
 
 def init_cost_array(cities):
-    print("entered init_cost_array")
     for i in range(len(cities)):
         cost_row = []
         for j in range(len(cities)):
