@@ -283,7 +283,8 @@ def get_cost(path):
     for i in range(len(path)):
         j = (i + 1) % len(path)
         path_cost += cost_array[path[i]][path[j]]
-    return path_
+    return path_cost
+
 
 # get_cost_fp :: [Cities] -> Nat
 def get_cost_fp(path):
@@ -413,12 +414,12 @@ def strat_bb(cities, time_allowance, instrumenter):
 
     # Greedily search for an initial solution
     greedy_state = dfs_greedy(cities, states[0], instrumenter)
-    if (greedy_state is None) or (state_lb(greedy_state) == float('inf')):
+    greedy_cost = get_cost_fp(state_path(greedy_state))
+    if (greedy_state is None) or (greedy_cost == float('inf')):
         print("Error: greedy search failed!")
         return None
 
-    bssf = greedy_state
-    # FIXME: update the lb on the greedy state
+    bssf = (None, greedy_cost, greedy_state[2], greedy_state[3])
 
     # Now that we have a decent value for best search so far, we can
     # start our regular branch-and-bound search
