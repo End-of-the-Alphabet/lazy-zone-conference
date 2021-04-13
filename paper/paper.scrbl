@@ -50,10 +50,40 @@ In our paper, we examine a simple greedy algorithm, which usually performs much 
 
 @section{Greed is Acceptable}
 
-One simple improvement over the brute-force method is a @emph{greedy} search technique: given a starting node, simply select the closest node that has not yet been visited. 
+One simple improvement over the brute-force method is a @emph{greedy} search technique: given a starting node, simply select the closest node that has not yet been visited. For a game of @italic{Asteroids}, this is probably going to be sufficient.
+
+@figure-here["asteroids-path" @elem{Greedy route for drawing a frame of @italic{Asteroids}} (image "./resources/Asteroids_path_lines.png" #:scale 0.13)]
+
+Greedy routes can give us decent solutions. They are @emph{not} guaranteed to be optimal, and can fail in otherwise simple cases.@note{Generated using the "Easy" setting with seed 909.}
+
+@figure-here["suboptimal-greedy" @elem{With the right conditions, greedy solutions are not the best} (image "./resources/suboptimal_greedy.png" #:scale 0.3)]
+
+@; FIXME: finish up here
+
+@subsection[#:tag "greedy-algo"]{Algorithm Description}
+
+Given a set of @${n} cities @${\{C\}}, find a path of cities @${c_1, c_2, \ldots, c_n}, encountered by greedily selecting the best next city not visited.
+
+@; FIXME: Add greedy search algorithm
 
 @section{Tabu Search: No Forbidden Paths}
 
+Can we do better than greedy without spending all the effort to find an optimal solution? The Tabu List algorithm is a local search algorithm: from a starting state, the Tabu Search attempts to find better solutions living relatively nearby in the solution space to the TSP.
+
+@subsection{Algorithm Description}
+
+Given a set of @${n} cities @${\{C\}}, find a path of cities @${c_1, c_2, \ldots, c_n}, such that @${\sum_{i=1}^{n} cost(c_i, c_{i+1})} is minimized within a given running time.
+
+@itemlist[#:style 'ordered
+  @item{@exact{[Initilize.]} Initilize a Tabu list @${T} to be the empty set, and a neighborhood definition as @${N} to be 3. (The initial neighborhood definition can be tweaked.) }
+  @item{@exact{[Find a starting place.]} Run the Greedy Algorithm (@secref{greedy-algo}) and save the result as our initial path as @${P_{best}}. }
+  @item{@exact{[Update the best solution so far.]} Compare @${P_{best}} with the new result:
+    @itemlist[#:style 'ordered
+      @item{If @${P_{best} = result}, @${N \leftarrow N + 1} }
+      @item{Otherwise, @${P_{best} \leftarrow result}}
+    ]
+  }
+]
 
 @section{Evaluation}
 
