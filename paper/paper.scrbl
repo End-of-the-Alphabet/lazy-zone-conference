@@ -58,13 +58,20 @@ Greedy routes can give us decent solutions. They are @emph{not} guaranteed to be
 
 @figure-here["suboptimal-greedy" @elem{With the right conditions, greedy solutions are not the best} (image "./resources/suboptimal_greedy.png" #:scale 0.3)]
 
-@; FIXME: finish up here
+Nevertheless, a greedy algorithm can yield a good enough solution for many cases, and there are algorithms that use a greedy approach to get a good starting point, and then they improve on it. Branch-and-bound is one such algorithm that can use a greedy solution to get an approximate solution and then prune solutions that are less good. The Tabu Search presented in this paper is another such algorithm.
 
 @subsection[#:tag "greedy-algo"]{Algorithm Description}
 
 Given a set of @${n} cities @${\{C\}}, find a path of cities @${c_1, c_2, \ldots, c_n}, encountered by greedily selecting the best next city not visited.
 
-@; FIXME: Add greedy search algorithm
+@itemlist[#:style 'ordered
+  @item{@exact{[Initilize.]} Pick some starting city @${c}, and add it to your path @${p}.}
+  @item{@exact{[Select closest neighbor.]} For each city in @${C} that is not in the path @${p}, find the city with the lowest cost from @${c}.}
+  @item{@exact{[Recur.]} Add this city to the end of the path, and recur as if at 2.}
+  @item{@exact{[Backtrack.]} If recurring does not yield a valid path, or this is the last city in the path, and there is no route back to the start city, fail.}
+  @item{@exact{[Try a different path.]} If there are still more cities that you can try from @${c}, try those in order of increasing distance.}
+  @item{@exact{[Give up.]} If no more cities are left, fail.}
+]
 
 @section{Tabu Search: No Forbidden Paths}
 
