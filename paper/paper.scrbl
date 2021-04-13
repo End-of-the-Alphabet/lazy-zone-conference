@@ -73,6 +73,12 @@ Given a set of @${n} cities @${\{C\}}, find a path of cities @${c_1, c_2, \ldots
   @item{@exact{[Give up.]} If no more cities are left, fail.}
 ]
 
+@subsection{Algorithm Analysis}
+
+Step 1 runs once in @${O(1)} time. For step 2, we search the remaining cities and recur on each one until we have a full path. At each successive call, the set of cities to search gets smaller, but we have roughly a search problem order @${O(n)} called @${n} times, so this means this step is @${O(n^2)}. This dominates, so the entire complexity of the greedy algorithm is order @${O(n^2)}.
+
+This is expected; this is just a depth-first search of our graph where we let the weights of the edges be the discriminant in determining which path to traverse next. It does not yield an optimal solution, but it is a quick-running polynomial-time algorithm that gets us some results better than just a random walk.
+
 @section{Tabu Search: No Forbidden Paths}
 
 Can we do better than greedy without spending all the effort to find an optimal solution? The Tabu List algorithm is a local search algorithm: from a starting state, the Tabu Search attempts to find better solutions living relatively nearby in the solution space to the TSP.
@@ -99,6 +105,9 @@ Given a set of @${n} cities @${\{C\}}, find a path of cities @${c_1, c_2, \ldots
   @item{@exact{[Repeat?]} If we still have some time left, and @${N < |C|}, go back to 3.}
   @item{@exact{[Return best.]} If we're out of time, return @${P_{best}}.}
 ]
+
+@subsection{Algorithm Analysis}
+
 
 @section{Evaluation}
 
