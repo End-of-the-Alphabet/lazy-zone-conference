@@ -320,18 +320,21 @@ def dfs_greedy(cities, state, instrument):
         else:
             return None
     else:
-        next_states = gen_next_states(state, cities)
-        instrument.inc_states_created(len(next_states))
-        next_states.sort(key=lambda x: state_lb(x))
+        next_cities = []
+        for c in cities:
+            if not c in state_path(state):
+                next_cities.append(c)
 
-        for s in next_states:
-            if state_lb(s) != float('inf'):
-                fs = dfs_greedy(cities, s, instrument)
+        next_cities.sort(key=lambda x: cost(state_path(state)[-1], x))
+        
+        for c in next_cities:
+            if cost(state_path(state)[-1], c) != float('inf'):
+                (a1, a2, a3, a4) = state
+                fs = dfs_greedy(cities, (a1, a2, a3+1, a4 + [c]), instrument)
                 if not (fs is None):
                     return fs
 
         return None
-
 
 def test_dfs_greedy():
     loc = [QPointF(0, 2), QPointF(2, 3), QPointF(3, 1), QPointF(1, -2), QPointF(-2, 0)]
@@ -397,6 +400,7 @@ def strat_bb(cities, time_allowance, instrumenter):
         return None
 
     bssf = greedy_state
+    # FIXME: update the lb on the greedy state
 
     # Now that we have a decent value for best search so far, we can
     # start our regular branch-and-bound search
@@ -628,14 +632,15 @@ def print_matrix(mtx):
 
 
 def pprint_state(st):
-    print("/--------------------------------------------------\\")
-    print(f"Depth: {state_depth(st)}; lb: {state_lb(st)}")
+    # print("/--------------------------------------------------\\")
+    print(f"Depth: {state_depth(st)}; lb: {state_lb(st)}", end=" ")
     print("Path: ", end="")
     for c in state_path(st):
         print(f"{c._index}", end=", ")
 
-    print_matrix(st[0])
-    print("\\--------------------------------------------------/")
+    # print_matrix(st[0])
+    # print("\\--------------------------------------------------/")
+    print()
 
 
 def state_lb(state):
