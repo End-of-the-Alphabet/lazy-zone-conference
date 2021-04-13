@@ -77,6 +77,7 @@ Given a set of @${n} cities @${\{C\}}, find a path of cities @${c_1, c_2, \ldots
 @itemlist[#:style 'ordered
   @item{@exact{[Initilize.]} Initilize a Tabu list @${T} to be the empty set, and a neighborhood definition as @${N} to be 3. (The initial neighborhood definition can be tweaked.) }
   @item{@exact{[Find a starting place.]} Run the Greedy Algorithm (@secref{greedy-algo}) and save the result as our initial path as @${P_{best}}. }
+  @item{@exact{[]}}
   @item{@exact{[Update the best solution so far.]} Compare @${P_{best}} with the new result:
     @itemlist[#:style 'ordered
       @item{If @${P_{best} = result}, @${N \leftarrow N + 1} }
