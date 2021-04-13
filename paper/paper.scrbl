@@ -128,11 +128,14 @@ Steps 4 and 5 are a little trickier. First, we generate all the permuatations of
 
 @section{Evaluation}
 
+Below is the table of results for running our algorithm against the random, greedy, branch-and-bound, and the Tabu Search.
+
 @tabular[
+	#:sep @hspace[2]
 	#:column-properties '(left right)
-	#:row-properties '(border)
-	(list (list @bold{# Cities} @bold{Random} 'cont @bold{Greedy} 'cont 'cont @bold{Branch & Bound} 'cont 'cont @bold{Tabu List} 'cont 'cont)
-	      (list "" @smaller[@~ "Time" @~] @smaller[@~ "Path Length" @~] @smaller[@~ "Time" @~] @smaller[@~ "Path Length" @~] @smaller[@~ "% of Random" @~] @smaller[@~ "Time" @~] @smaller[@~ "Path Length" @~] @smaller[@~ "% of Greedy" @~] @smaller[@~ "Time" @~] @smaller[@~ "Path Length" @~] @smaller[@~ "% of Greedy" @~])
+	#:row-properties '(bottom-border)
+	(list (list @bold{# Cities} @bold{Random} 'cont @bold{Greedy} 'cont 'cont @bold{Branch & Bound} 'cont 'cont @bold{Tabu Search} 'cont 'cont)
+	      (list "" @smaller{Time (s)} @smaller{Path Length} @smaller{Time (s)} @smaller{Path Length} @smaller{% of Random} @smaller{Time (s)} @smaller{Path Length} @smaller{% of Greedy} @smaller{Time (s)} @smaller{Path Length} @smaller{% of Greedy})
 	      (map number->string (list 15 1 2 1 2 3 1 2 3 1 2 3))
 	      (map number->string (list 20 1 2 1 2 3 1 2 3 1 2 3))
 	      (map number->string (list 25 1 2 1 2 3 1 2 3 1 2 3))
