@@ -236,6 +236,8 @@ def tabu_search(cities, time_allowance, instrumenter, curr_bssf):
     :return updated_path: best path in the neighborhood
 '''
 def tabu_helper(path, neighborhood_def, start_time, time_allowance):
+    # path is always our best path so far
+
     # outside_neighborhood: leave off the last `neighborhood_def` cities on path
     # inside_neighborhood: get the part that we trimmed off
     # so, let (outside, inside) (split-at-from-end path neighborhood_def)

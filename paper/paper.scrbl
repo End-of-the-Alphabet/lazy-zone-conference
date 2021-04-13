@@ -77,13 +77,19 @@ Given a set of @${n} cities @${\{C\}}, find a path of cities @${c_1, c_2, \ldots
 @itemlist[#:style 'ordered
   @item{@exact{[Initilize.]} Initilize a Tabu list @${T} to be the empty set, and a neighborhood definition as @${N} to be 3. (The initial neighborhood definition can be tweaked.) }
   @item{@exact{[Find a starting place.]} Run the Greedy Algorithm (@secref{greedy-algo}) and save the result as our initial path as @${P_{best}}. }
-  @item{@exact{[]}}
-  @item{@exact{[Update the best solution so far.]} Compare @${P_{best}} with the new result:
+  @; @item{@exact{[Prepare for mutation.]} }
+  @item{@exact{[Mutate.]} Take a walk in the neighborhood:
     @itemlist[#:style 'ordered
-      @item{If @${P_{best} = result}, @${N \leftarrow N + 1} }
-      @item{Otherwise, @${P_{best} \leftarrow result}}
+    @item{@exact{[Split the path.]} Set @${(outside, inside) \leftarrow split(P_{best}, N)} where @tt{split :: [Cities] @${\rightarrow \mathbb{N} \rightarrow} ([Cities], [Cities])} returns list split at the @${N^{th}} element from the end. }
+    @item{@exact{[Collect permuatations.]} Let @${\pi} be the set of all permuatations of @${inside}. Prepend @${outside} to each element of @${inside}. @${\pi} is now a list of paths nearby @${P_{best}} in our solution space. }
+    @item{@exact{[Thin.]} Drop all elements of @${\pi} that appear in our tabu list @${T}.}
+    @item{@exact{[Find the best mutation.]} For each path @${i} in @${\pi}, if @${cost(i) < cost(P_{best})}, set @${P_{best} \leftarrow i}.
+      }
     ]
   }
+  @item{@exact{[Increase mutation rate?]} If @${P_{best}} has not changed, increase the mutation rate: @${N \leftarrow N + 1}.}
+  @item{@exact{[Repeat?]} If we still have some time left, go back to 3.}
+  @item{@exact{[Return best.]} If we're out of time, return @${P_{best}}.}
 ]
 
 @section{Evaluation}
