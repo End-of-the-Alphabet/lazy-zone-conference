@@ -2,8 +2,11 @@
 @(require scribble/core)
 @(require scriblib/footnote)
 @(require scriblib/figure)
+@(require scriblib/bibtex)
 @; First off, there is a scribble-mode for emacs
 @; Second, this was helpful: https://prl.ccs.neu.edu/blog/2019/02/17/writing-a-paper-with-scribble/
+
+@(define-bibtex-cite "./resources/references.bib")
 
 @(define (exact . stuff)
    @; the style name "relax" puts a `\relax` no-op in front of the stuff
@@ -73,7 +76,7 @@ Given a set of @${n} cities @${\{C\}}, find a path of cities @${c_1, c_2, \ldots
   @item{@exact{[Give up.]} If no more cities are left, fail.}
 ]
 
-@subsection{Algorithm Analysis}
+@subsection[#:tag "greedy-analysis"]{Algorithm Analysis}
 
 Step 1 runs once in @${O(1)} time. For step 2, we search the remaining cities and recur on each one until we have a full path. At each successive call, the set of cities to search gets smaller, but we have roughly a search problem order @${O(n)} called @${n} times, so this means this step is @${O(n^2)}. This dominates, so the entire complexity of the greedy algorithm is order @${O(n^2)}.
 
@@ -108,6 +111,11 @@ Given a set of @${n} cities @${\{C\}}, find a path of cities @${c_1, c_2, \ldots
 
 @subsection{Algorithm Analysis}
 
+Step 1 takes @${O(1)} time to initialize the algorithm. Step 2 calls out to the Greedy algorithm (@secref{greedy-analysis}) which takes @${O(n^2)} time.
+
+Step 3 is @${O(1)} if we choose our data structures correctly; a good implementation can just set pointers to subsets of an array appropriately and be done.
+
+Steps 4 and 5 are a little trickier. First, we generate all the permuatations of a set. Knuth @cite{knuth_art_2005} lists several algorithms; however, for smaller values of the neighborhood @${N}, a simple recursive solution should be sufficient. For the purposes of this analysis, we'll consider permutation creation @${O(N)}@note{@${N}, not @${n}: it's relative to the size of our neighborhood parameter.} and checking tabu list for set inclusion to be order @${O(1)}; a hash map may be used to implement quick insertion and deletion of set elements.
 
 @section{Evaluation}
 
