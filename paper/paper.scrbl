@@ -87,6 +87,10 @@ This is expected; this is just a depth-first search of our graph where we let th
 
 Can we do better than greedy without spending all the effort to find an optimal solution? The Tabu List algorithm is a local search algorithm: from a starting state, the Tabu Search attempts to find better solutions living relatively nearby in the solution space to the TSP.
 
+@subsection{Intuition}
+
+@; TODO
+
 @subsection{Algorithm Description}
 
 Given a set of @${n} cities @${\{C\}}, find a path of cities @${c_1, c_2, \ldots, c_n}, such that @${\sum_{i=1}^{n} cost(c_i, c_{i+1})} is minimized within a given running time.
@@ -120,8 +124,10 @@ Steps 4 and 5 are a little trickier. First, we generate all the permuatations of
 
 @section{Evaluation}
 
+@; TODO
+
 @section{Further Work}
 
-@section{References}
+@; TODO
 
 @(generate-bibliography)
