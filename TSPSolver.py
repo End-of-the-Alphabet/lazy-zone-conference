@@ -127,7 +127,7 @@ class TSPSolver:
         end_time = time.time()
 
         if not (final_state is None):
-            return {'cost': get_cost(state_path(final_state)),
+            return {'cost': get_cost_fp(state_path(final_state)),
                     'time': end_time - start_time,
                     'count': inst.solutions_found,
                     'soln': TSPSolution(state_path(final_state)),
@@ -283,7 +283,7 @@ def get_cost(path):
     for i in range(len(path)):
         j = (i + 1) % len(path)
         path_cost += cost_array[path[i]][path[j]]
-    return path_
+    return path_cost
 
 # get_cost_fp :: [Cities] -> Nat
 def get_cost_fp(path):
