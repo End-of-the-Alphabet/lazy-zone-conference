@@ -92,7 +92,7 @@ class TSPSolver:
         end_time = time.time()
 
         if not (final_state is None):
-            return {'cost': state_lb(final_state),
+            return {'cost': get_cost(state_path(final_state)),
                     'time': end_time - start_time,
                     'count': inst.solutions_found,
                     'soln': TSPSolution(state_path(final_state)),
