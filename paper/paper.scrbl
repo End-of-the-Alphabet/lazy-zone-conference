@@ -3,10 +3,11 @@
 @(require scriblib/footnote)
 @(require scriblib/figure)
 @(require scriblib/bibtex)
+@(require scriblib/autobib)
 @; First off, there is a scribble-mode for emacs
 @; Second, this was helpful: https://prl.ccs.neu.edu/blog/2019/02/17/writing-a-paper-with-scribble/
 
-@(define-bibtex-cite "./resources/references.bib")
+@(define-bibtex-cite "./resources/references.bib" ~cite citet generate-bibliography #:style number-style)
 
 @(define (exact . stuff)
    @; the style name "relax" puts a `\relax` no-op in front of the stuff
@@ -115,13 +116,12 @@ Step 1 takes @${O(1)} time to initialize the algorithm. Step 2 calls out to the 
 
 Step 3 is @${O(1)} if we choose our data structures correctly; a good implementation can just set pointers to subsets of an array appropriately and be done.
 
-Steps 4 and 5 are a little trickier. First, we generate all the permuatations of a set. Knuth @cite{knuth_art_2005} lists several algorithms; however, for smaller values of the neighborhood @${N}, a simple recursive solution should be sufficient. For the purposes of this analysis, we'll consider permutation creation @${O(N)}@note{@${N}, not @${n}: it's relative to the size of our neighborhood parameter.} and checking tabu list for set inclusion to be order @${O(1)}; a hash map may be used to implement quick insertion and deletion of set elements.
+Steps 4 and 5 are a little trickier. First, we generate all the permuatations of a set. Knuth @~cite{knuth_art_2005} lists several algorithms; however, for smaller values of the neighborhood @${N}, a simple recursive solution should be sufficient. For the purposes of this analysis, we'll consider permutation creation @${O(N)}@note{@${N}, not @${n}: it's relative to the size of our neighborhood parameter.} and checking tabu list for set inclusion to be order @${O(1)}; a hash map may be used to implement quick insertion and deletion of set elements.
 
 @section{Evaluation}
 
-
-@section{Formal Analysis}
-
-
 @section{Further Work}
 
+@section{References}
+
+@(generate-bibliography)
