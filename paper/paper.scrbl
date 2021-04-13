@@ -103,12 +103,9 @@ Given a set of @${n} cities @${\{C\}}, find a path of cities @${c_1, c_2, \ldots
   @; @item{@exact{[Prepare for mutation.]} }
   @item{@exact{[Mutate.]} Take a walk in the neighborhood:
     @itemlist[#:style 'ordered
-    @item{@exact{[Split the path.]} Set @${(outside, inside) \leftarrow split(P_{best}, N)} where @tt{split :: [Cities] @${\rightarrow \mathbb{N} \rightarrow} ([Cities], [Cities])} returns list split at the @${N^{th}} element from the end. }
-    @item{@exact{[Collect permutations.]} Let @${\pi} be the set of all permutations of @${inside}. Prepend @${outside} to each element of @${inside}. @${\pi} is now a list of paths nearby @${P_{best}} in our solution space. }
-    @item{@exact{[Thin.]} Drop all elements of @${\pi} that appear in our tabu list @${T}.}
-    @item{@exact{[Find the best mutation.]} For each path @${i} in @${\pi}, if @${cost(i) < cost(P_{best})}, set @${P_{best} \leftarrow i}.
-      }
-     @item{@exact{[Add path to tabu list.]} Add path @${i} to @${T}. If @${|T| > tabu\_limit}, drop enough elements of @${T} so that it's within our limit.}
+    @item{@exact{[Flip some cities.]} Swap @${N} pairs of cities. Discard any routes that appear in the tabu list @${T}.}
+    @item{@exact{[Find the best mutation.]} While creating the mutations, keep track of the best one found in @${P_{best}}. Once you've done @${N} sets of @${N} swaps, return the best.}
+    @item{@exact{[Add path to tabu list.]} Add each new path that's better than the current best to the tabu list @${T}. If @${|T| > tabu\_limit}, drop enough elements of @${T}, starting from the oldest, so that it's within our size limit.}
     ]
   }
   @item{@exact{[Increase mutation rate?]} If @${P_{best}} has not changed, increase the mutation rate: @${N \leftarrow N + 1}.}
@@ -120,16 +117,17 @@ Given a set of @${n} cities @${\{C\}}, find a path of cities @${c_1, c_2, \ldots
 
 Step 1 takes @${O(1)} time to initialize the algorithm. Step 2 calls out to the Greedy algorithm (@secref{greedy-analysis}) which takes @${O(n^2)} time.
 
-Step 3 is @${O(1)} if we choose our data structures correctly; a good implementation can just set pointers to subsets of an array appropriately and be done.
+For any given neighborhood size @${N}, step 3 runs roughly @${O(N^2)} times. If we assume efficient lookup, addition, and truncation of the Tabu list, (for example, by using a hash map where these operations take @${O(1)} time) then we get an overall complexity of @${O(N^2)} for this step.
 
-Steps 4 and 5 are a little trickier. First, we generate all the permuatations of a set. Knuth @~cite[knuth-art] lists several algorithms; however, for smaller values of the neighborhood @${N}, a simple recursive solution should be sufficient. For the purposes of this analysis, we'll consider permutation creation @${O(N)}@note{@${N}, not @${n}: it's relative to the size of our neighborhood parameter.} and checking tabu list for set inclusion to be order @${O(1)}; a hash map may be used to implement quick insertion and deletion of set elements.
+Knuth @~cite[knuth-art] lists several algorithms for creating permutations; further work might investigate the effectiveness of choosing different permutations in the neighborhood.
 
-@; TODO: finish up here
+Steps 4, 5, and 6 are variably adjustable: we can run these as long as we have time. This is one unique aspect of the Tabu search: we don't ever have to converge: we can keep running the algorithm indefinitely and allow it to explore the search space some more. Eventually we stop making improvements to our path, but even then we don't know whether or not we have an optimal solution.
 
-@section{Evaluation}
+@section{Empirical Evaluation}
 
-Below is the table of results for running our algorithm against the random, greedy, branch-and-bound, and the Tabu Search.
+@Figure-ref{results} is the table of results for running our algorithm against the random, greedy, branch-and-bound, and the Tabu Search.
 
+@figure**["results" "Empirical results for Tabu search versus other algorithms"
 @tabular[
 	#:sep @hspace[2]
 	#:column-properties '(left right)
@@ -141,10 +139,13 @@ Below is the table of results for running our algorithm against the random, gree
 	      (map number->string (list 25 1 2 1 2 3 1 2 3 1 2 3))
 	)
 ]
+]
 
 
 @section{Further Work}
 
-@; TODO
+There's a lot of interesting work that could be done with this algorithm. Some immediately apparent areas of interest include looking at the optimum number of cities to try swapping: swapping cities is a special case of a more generalized algorithm where we look at all permutations of some @${m} cities; this algorithm is effectively the case where @${m=2}.
+
+Other areas of interest include refinements to the original search, changing where the swaps take place inside the path, etc.
 
 @(generate-bibliography)
