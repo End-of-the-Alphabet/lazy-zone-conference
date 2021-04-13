@@ -293,19 +293,6 @@ def get_cost_fp(path):
         path_cost += cost(path[i], path[(i + 1) % len(path)])
     return path_cost
 
-# get_cost_fp :: [Cities] -> Nat
-def get_cost_fp(path):
-    path_cost = 0
-    for i in range(len(path)):
-        path_cost += cost(path[i], path[(i + 1) % len(path)])
-    return path_cost
-
-def get_cost_fp(path):
-    path_cost = 0
-    for i in range(len(path)):
-        path_cost += cost(path[i], path[(i + 1) % len(path)])
-    return path_cost
-
 
 def init_cost_array(cities):
     for i in range(len(cities)):
