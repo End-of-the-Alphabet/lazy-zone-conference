@@ -220,6 +220,7 @@ def tabu_search(cities, time_allowance, instrumenter, curr_bssf):
         curr_bssf = tabu_helper(curr_bssf, curr_neighborhood_def, start_time, time_allowance)
         if curr_bssf == old_bssf:
             curr_neighborhood_def += 1
+            print(f"Neighborhood def now {curr_neighborhood_def}")
         else:
             curr_neighborhood_def = base_neighborhood_def
         if curr_neighborhood_def == len(cities):
@@ -257,12 +258,6 @@ def tabu_helper(path, neighborhood_def, start_time, time_allowance):
             tabu_list.pop(0)
 
     return best_path
-
-
-def get_all_perms(arr):
-    perms = list(itertools.permutations(arr))
-    perm_list = [list(perm) for perm in perms]
-    return perm_list
 
 
 def get_cost(path):
