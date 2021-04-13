@@ -210,6 +210,8 @@ def tabu_search(cities, time_allowance, instrumenter, curr_bssf):
     # get cost array
     init_cost_array(cities)
 
+    greedy_cost = get_cost(curr_bssf)
+
     # start search, end search when time runs out
     start_time = time.time()
     base_neighborhood_def = 3
@@ -226,8 +228,13 @@ def tabu_search(cities, time_allowance, instrumenter, curr_bssf):
         if curr_neighborhood_def == len(cities):
             break
 
-    # TODO: convert curr_bssf into an array of cities
-    return curr_bssf, get_cost(curr_bssf)
+    best_cost = get_cost(curr_bssf)
+    if greedy_cost < best_cost:
+        i = "old is better"
+    if greedy_cost > best_cost:
+        i = "new is better"
+
+    return curr_bssf, best_cost
 
 
 '''
@@ -246,16 +253,27 @@ def tabu_helper(path, neighborhood_def, start_time, time_allowance):
     inside_neighborhood = path[len(path) - neighborhood_def:]
 
     best_path = path
-    for perm in itertools.permutations(inside_neighborhood):
-        path = outside_neighborhood + list(perm)
-        if time.time() - start_time > time_allowance:
-            return best_path
-        # TODO: make sure that not in works correctly
-        if get_cost(path) < get_cost(best_path):
-            best_path = path
-        tabu_list.append(path)
-        if len(tabu_list) > tabu_limit:
-            tabu_list.pop(0)
+
+    for i in range(len(inside_neighborhood)):
+        for j in range(i+1, len(inside_neighborhood)):
+            if time.time() - start_time > time_allowance:
+                return best_path
+
+            inside_copy = inside_neighborhood.copy()
+            old_i = inside_copy[i]
+            inside_copy[i] = inside_copy[j]
+            inside_copy[j] = old_i
+
+            path = outside_neighborhood + inside_copy
+
+            path_cost = get_cost(path)
+            best_cost = get_cost(best_path)
+
+            if path not in tabu_list and path_cost < best_cost:
+                best_path = path
+            tabu_list.append(path)
+            if len(tabu_list) > tabu_limit:
+                tabu_list.pop(0)
 
     return best_path
 
