@@ -80,42 +80,33 @@ class TSPSolver:
     '''
 
     def greedy(self, time_allowance=60.0):
-        results = {}
-        cities = self._scenario.getCities().copy()
-        foundTour = False
-        bssf = None
-        start_time = time.time()
-        curr_index = 0
-        # At most time_allowance time to complete
-        while not foundTour and time.time() - start_time < time_allowance:
-            if len(cities) == 0:
-                break
-            curr_city = cities.pop(curr_index)  # Pop is O(1) complexity both space and time
-            curr_route = [curr_city]
-            while len(cities):  # As long as cities isn't empty this will run, O(n) space and time
-                closest_path = float('inf')
-                index = 0  # O(n) -- for loop
-                for i in range(len(cities)):
-                    dist = curr_city.costTo(cities[i])
-                    if dist < closest_path:
-                        closest_path = dist
-                        index = i
-                curr_city = cities.pop(index)  # Another O(1) pop
-                curr_route.append(curr_city)
-            bssf = TSPSolution(curr_route)
-            if bssf.cost != float('inf'):
-                foundTour = True
-            curr_index += 1
-        end_time = time.time()
-        results['cost'] = bssf.cost if foundTour else math.inf
-        results['time'] = end_time - start_time
-        results['count'] = 1
-        results['soln'] = bssf
-        results['max'] = None
-        results['total'] = None
-        results['pruned'] = None
-        return results
+        inst = Instrumenter()
+        cities = self._scenario.getCities()
+        cities.sort(key=lambda c: c._index)
 
+        start_time = time.time()
+        start_state = bb_init_state(cities, cities[0])
+
+        final_state = dfs_greedy(cities, start_state, inst)
+
+        end_time = time.time()
+
+        if not (final_state is None):
+            return {'cost': state_lb(final_state),
+                    'time': end_time - start_time,
+                    'count': inst.solutions_found,
+                    'soln': TSPSolution(state_path(final_state)),
+                    'max': inst.max_queue,
+                    'total': inst.states_created,
+                    'pruned': inst.states_pruned }
+        else:
+            return {'cost': float('inf'),
+                    'time': end_time - start_time,
+                    'count': inst.solutions_found,
+                    'soln': None,
+                    'max': inst.max_queue,
+                    'total': inst.states_created,
+                    'pruned': inst.states_pruned }
 
     ''' <summary>
         This is the entry point for the branch-and-bound algorithm that you will implement
@@ -245,7 +236,9 @@ def tabu_search(cities, time_allowance, instrumenter, curr_bssf):
     :return updated_path: best path in the neighborhood
 '''
 def tabu_helper(path, neighborhood_def, start_time, time_allowance):
-    print("entered tabu_helper")
+    # outside_neighborhood: leave off the last `neighborhood_def` cities on path
+    # inside_neighborhood: get the part that we trimmed off
+    # so, let (outside, inside) (split-at-from-end path neighborhood_def)
     outside_neighborhood = path[:len(path) - neighborhood_def]
     inside_neighborhood = path[len(path) - neighborhood_def:]
     neighborhood_permutations = get_all_perms(inside_neighborhood)
