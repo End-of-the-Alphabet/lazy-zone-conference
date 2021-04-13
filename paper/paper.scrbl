@@ -75,7 +75,7 @@ Can we do better than greedy without spending all the effort to find an optimal 
 Given a set of @${n} cities @${\{C\}}, find a path of cities @${c_1, c_2, \ldots, c_n}, such that @${\sum_{i=1}^{n} cost(c_i, c_{i+1})} is minimized within a given running time.
 
 @itemlist[#:style 'ordered
-  @item{@exact{[Initilize.]} Initilize a Tabu list @${T} to be the empty set, and a neighborhood definition as @${N} to be 3. (The initial neighborhood definition can be tweaked.) }
+  @item{@exact{[Initilize.]} Initilize a Tabu list @${T} to be the empty set, and a neighborhood definition as @${N} to be 3. (The initial neighborhood definition can be tweaked.) Set @${tabu\_limit} to some positive integer. This defines how many paths we remember as having been searched.}
   @item{@exact{[Find a starting place.]} Run the Greedy Algorithm (@secref{greedy-algo}) and save the result as our initial path as @${P_{best}}. }
   @; @item{@exact{[Prepare for mutation.]} }
   @item{@exact{[Mutate.]} Take a walk in the neighborhood:
@@ -85,10 +85,11 @@ Given a set of @${n} cities @${\{C\}}, find a path of cities @${c_1, c_2, \ldots
     @item{@exact{[Thin.]} Drop all elements of @${\pi} that appear in our tabu list @${T}.}
     @item{@exact{[Find the best mutation.]} For each path @${i} in @${\pi}, if @${cost(i) < cost(P_{best})}, set @${P_{best} \leftarrow i}.
       }
+     @item{@exact{[Add path to tabu list.]} Add path @${i} to @${T}. If @${|T| > tabu\_limit}, drop enough elements of @${T} so that it's within our limit.}
     ]
   }
   @item{@exact{[Increase mutation rate?]} If @${P_{best}} has not changed, increase the mutation rate: @${N \leftarrow N + 1}.}
-  @item{@exact{[Repeat?]} If we still have some time left, go back to 3.}
+  @item{@exact{[Repeat?]} If we still have some time left, and @${N < |C|}, go back to 3.}
   @item{@exact{[Return best.]} If we're out of time, return @${P_{best}}.}
 ]
 
