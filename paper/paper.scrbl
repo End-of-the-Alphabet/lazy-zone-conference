@@ -161,4 +161,8 @@ There's a lot of interesting work that could be done with this algorithm. Some i
 
 Other areas of interest include refinements to the original search, changing where the swaps take place inside the path, etc. Different sizes of the Tabu list could also be used to get out of particular local optima. We suggest looking at these factors for any further work.
 
+@section{Source Code}
+
+For the source code used in this project, please see our GitHub repo: @url{https://github.com/End-of-the-Alphabet/lazy-zone-conference}
+
 @(generate-bibliography)
