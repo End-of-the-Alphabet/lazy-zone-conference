@@ -93,9 +93,9 @@ Can we do better than greedy without spending all the effort to find an optimal 
 
 In layman’s terms, the tabu algorithm takes a previously found path, in this case from the solution of the greedy algorithm we implemented, and attempts to improve upon said solution. It does this by taking a certain number of items found at the end of the path array, finds every permutation---all possible combinations of the final items---reinserts each permutation into the first array segment, and checks the cost of each new path for all created permutations. If a new path is better, i.e lower in cost, then it will now become the current best solution.
 
-@figure-here["greedy-segment" "Example of sub-optimal path from greedy search" (image "./resources/non-optimal-detail.png" #:scale 0.3)]
+@figure-here["greedy-segment" "Example of sub-optimal path from greedy search" (image "./resources/non-optimal-detail.png" #:scale 0.5)]
 
-@figure-here["better-segment" "Same segment after better permutation of the cities found by Tabu Search" (image "./resources/optimal-detail.png" #:scale 0.3)]
+@figure-here["better-segment" "Same segment after better permutation of the cities found by Tabu Search" (image "./resources/optimal-detail.png" #:scale 0.5)]
 
 The starting number of items partitioned at the back is generally arbitrary, but we started at three because it is the smallest number of path items that could be rearranged for which the greedy algorithm would not have already found a better solution. If no new solution was found the window size would be increased by one. This process may continue until the time limit is reached.
 
@@ -133,7 +133,7 @@ Steps 4, 5, and 6 are variably adjustable: we can run these as long as we have t
 
 @Figure-ref{results} is the table of results for running our algorithm against the random, greedy, branch-and-bound, and the Tabu Search.
 
-@figure-here["results" "Empirical results for Tabu search versus other algorithms"
+@figure**["results" "Empirical results for Tabu search versus other algorithms"
 @tabular[
 	#:sep @hspace[2]
 	#:column-properties '(left right)
@@ -153,7 +153,7 @@ Steps 4, 5, and 6 are variably adjustable: we can run these as long as we have t
 
 Each of the results is the average of 5 successive runs. Each test was performed on the test harness's @tt{Hard} mode, which includes asymmetric and some infinite distances.
 
-The results show that we were consistently able to get improvements over the standard greedy algorithm. However, further refinements may be warrented to derive full value from the Tabu algorithm. Nevertheless, this is a promising algorithm.
+The results show that we were consistently able to get improvements over the standard greedy algorithm. However, further refinements may be warranted to derive full value from the Tabu algorithm. Nevertheless, this is a promising algorithm.
 
 @section{Further Work}
 
