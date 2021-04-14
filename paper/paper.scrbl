@@ -91,7 +91,13 @@ Can we do better than greedy without spending all the effort to find an optimal 
 
 @subsection{Intuition}
 
-@; TODO
+In layman’s terms, the tabu algorithm takes a previously found path, in this case from the solution of the greedy algorithm we implemented, and attempts to improve upon said solution. It does this by taking a certain number of items found at the end of the path array, finds every permutation---all possible combinations of the final items---reinserts each permutation into the first array segment, and checks the cost of each new path for all created permutations. If a new path is better, i.e lower in cost, then it will now become the current best solution.
+
+@figure-here["greedy-segment" "Example of sub-optimal path from greedy search" (image "./resources/non-optimal-detail.png" #:scale 0.3)]
+
+@figure-here["better-segment" "Same segment after better permutation of the cities found by Tabu Search" (image "./resources/optimal-detail.png" #:scale 0.3)]
+
+The starting number of items partitioned at the back is generally arbitrary, but we started at three because it is the smallest number of path items that could be rearranged for which the greedy algorithm would not have already found a better solution. If no new solution was found the window size would be increased by one. This process may continue until the time limit is reached.
 
 @subsection{Algorithm Description}
 
@@ -127,25 +133,32 @@ Steps 4, 5, and 6 are variably adjustable: we can run these as long as we have t
 
 @Figure-ref{results} is the table of results for running our algorithm against the random, greedy, branch-and-bound, and the Tabu Search.
 
-@figure**["results" "Empirical results for Tabu search versus other algorithms"
+@figure-here["results" "Empirical results for Tabu search versus other algorithms"
 @tabular[
 	#:sep @hspace[2]
 	#:column-properties '(left right)
 	#:row-properties '(bottom-border)
 	(list (list @bold{# Cities} @bold{Random} 'cont @bold{Greedy} 'cont 'cont @bold{Branch & Bound} 'cont 'cont @bold{Tabu Search} 'cont 'cont)
 	      (list "" @smaller{Time (s)} @smaller{Path Length} @smaller{Time (s)} @smaller{Path Length} @smaller{% of Random} @smaller{Time (s)} @smaller{Path Length} @smaller{% of Greedy} @smaller{Time (s)} @smaller{Path Length} @smaller{% of Greedy})
-	      (map number->string (list 15 1 2 1 2 3 1 2 3 1 2 3))
-	      (map number->string (list 20 1 2 1 2 3 1 2 3 1 2 3))
-	      (map number->string (list 25 1 2 1 2 3 1 2 3 1 2 3))
+	      (list "15" "0.0014" "19248" "0.001" "12134.2" "0.6304" "52.9764" "9800.2" "0.8076" "0.015" "11920" "0.9823")
+	      (list "30" "0.0232" "34790.4" "0.01" "17705.6" "0.5089" "TB" "TB" "TB" "0.1966" "17469.6" "0.9866")
+	      (list "60" "20.704" "81144.6" "0.0194" "27699.8" "0.3413" "TB" "TB" "TB" "3.1302" "27480.8" "0.9920")
+	      (list "100" "TB" "TB" "0.0672" "44932.8" "TB" "TB" "TB" "TB" "40.2176" "37455" "0.8335" )
+	      (list "200" "TB" "TB" "0.4308" "57153" "TB" "TB" "TB" "TB" "303.48" "56235" "0.9839" )
+	      (list "500" "TB" "TB" "6.224" "104135.4" "TB" "TB" "TB" "TB" "607.1588" "103808.4" "0.9968" )
+	      (list "750" "TB" "TB" "25.365" "136835.4" "TB" "TB" "TB" "TB" "629.9266" "136616.4" "0.9983" )
 	)
 ]
 ]
 
+Each of the results is the average of 5 successive runs. Each test was performed on the test harness's @tt{Hard} mode, which includes asymmetric and some infinite distances.
+
+The results show that we were consistently able to get improvements over the standard greedy algorithm. However, further refinements may be warrented to derive full value from the Tabu algorithm. Nevertheless, this is a promising algorithm.
 
 @section{Further Work}
 
 There's a lot of interesting work that could be done with this algorithm. Some immediately apparent areas of interest include looking at the optimum number of cities to try swapping: swapping cities is a special case of a more generalized algorithm where we look at all permutations of some @${m} cities; this algorithm is effectively the case where @${m=2}.
 
-Other areas of interest include refinements to the original search, changing where the swaps take place inside the path, etc.
+Other areas of interest include refinements to the original search, changing where the swaps take place inside the path, etc. Different sizes of the Tabu list could also be used to get out of particular local optima. We suggest looking at these factors for any further work.
 
 @(generate-bibliography)
